@@ -236,7 +236,6 @@ numpy==1.26.4
     #   bottleneck
     #   numexpr
     #   pandas
-    #   pyarrow
 odfpy==1.4.1
     # via pandas
 openpyxl==3.1.5
@@ -388,7 +387,7 @@ trio==0.28.0
     #   trio-websocket
 trio-websocket==0.11.1
     # via selenium
-typing-extensions==4.12.2
+typing-extensions==4.13.2
     # via
     #   apache-superset (pyproject.toml)
     #   alembic
