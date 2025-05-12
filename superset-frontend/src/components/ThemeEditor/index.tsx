@@ -22,26 +22,34 @@ import {
   themeObject,
   exampleThemes,
   SerializableThemeConfig,
-  SupersetTheme,
 } from '@superset-ui/core';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Icons } from 'src/components/Icons';
 
 interface ThemeEditorProps {
-  initialTheme?: SupersetTheme;
   tooltipTitle?: string;
   modalTitle?: string;
 }
 
 const ThemeEditor: React.FC<ThemeEditorProps> = ({
-  initialTheme = {},
   tooltipTitle = 'Edit Theme',
   modalTitle = 'Theme Editor',
 }) => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-  const jsonTheme: string = themeObject.json();
-  const [jsonMetadata, setJsonMetadata] = useState<string>(jsonTheme);
-  const [selectedTheme, setSelectedTheme] = useState<string | null>(null);
+
+  const initialTheme = localStorage.getItem('themeConfig')
+    ? JSON.parse(localStorage.getItem('themeConfig') || '{}')
+    : themeObject.json();
+
+  const [jsonMetadata, setJsonMetadata] = useState<string>(
+    JSON.stringify(initialTheme, null, 2),
+  );
+  const [selectedTheme, setSelectedTheme] = useState<string | null>(
+    Object.keys(exampleThemes).find(
+      key =>
+        JSON.stringify(exampleThemes[key]) === JSON.stringify(initialTheme),
+    ) || null,
+  );
 
   // Get theme names for the Select options
   const themeOptions: { value: string; label: string }[] = Object.keys(
@@ -64,6 +72,7 @@ const ThemeEditor: React.FC<ThemeEditorProps> = ({
       const parsedTheme = JSON.parse(jsonMetadata);
       console.log('Parsed theme:', parsedTheme);
       themeObject.setConfig(parsedTheme);
+      localStorage.setItem('themeConfig', JSON.stringify(parsedTheme));
       setIsModalOpen(false);
     } catch (error) {
       console.error('Invalid JSON in theme editor:', error);
@@ -76,7 +85,14 @@ const ThemeEditor: React.FC<ThemeEditorProps> = ({
     // When a theme is selected, update the JSON editor with the theme definition
     const themeData = exampleThemes[value] || ({} as SerializableThemeConfig);
     setJsonMetadata(JSON.stringify(themeData, null, 2));
+
+    localStorage.setItem('themeConfig', JSON.stringify(themeData));
+    themeObject.setConfig(themeData);
   };
+
+  useEffect(() => {
+    themeObject.setConfig(initialTheme);
+  }, []);
 
   return (
     <>
