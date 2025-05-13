@@ -148,7 +148,9 @@ class QueryObject:  # pylint: disable=too-many-instance-attributes
         self.order_desc = order_desc
         self.orderby = orderby or []
         self._set_post_processing(post_processing)
-        self.row_limit = row_limit
+        from superset import app
+
+        self.row_limit = app.config["ROW_LIMIT"]
         self.row_offset = row_offset or 0
         self._init_series_columns(series_columns, metrics, is_timeseries)
         self.series_limit = series_limit
@@ -190,8 +192,7 @@ class QueryObject:  # pylint: disable=too-many-instance-attributes
             return isinstance(metric, str) or is_adhoc_metric(metric)
 
         self.metrics = metrics and [
-            x if is_str_or_adhoc(x) else x["label"]  # type: ignore
-            for x in metrics
+            x if is_str_or_adhoc(x) else x["label"] for x in metrics  # type: ignore
         ]
 
     def _set_post_processing(

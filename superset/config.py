@@ -154,7 +154,7 @@ BUILD_NUMBER = None
 DEFAULT_VIZ_TYPE = "table"
 
 # default row limit when requesting chart data
-ROW_LIMIT = 50000
+ROW_LIMIT = 1000000
 # default row limit when requesting samples from datasource in explore view
 SAMPLES_ROW_LIMIT = 1000
 # default row limit for native filters
@@ -256,7 +256,7 @@ SQLALCHEMY_ENCRYPTED_FIELD_TYPE_ADAPTER = (  # pylint: disable=invalid-name
 SQLGLOT_DIALECTS_EXTENSIONS: DialectExtensions | Callable[[], DialectExtensions] = {}
 
 # The limit of queries fetched for query search
-QUERY_SEARCH_LIMIT = 1000
+QUERY_SEARCH_LIMIT = 1000000
 
 # Flask-WTF flag for CSRF
 WTF_CSRF_ENABLED = True
@@ -371,7 +371,7 @@ PUBLIC_ROLE_LIKE: str | None = None
 # Babel config for translations
 # ---------------------------------------------------
 # Setup default language
-BABEL_DEFAULT_LOCALE = "en"
+BABEL_DEFAULT_LOCALE = "zh"
 # Your application default translation path
 BABEL_DEFAULT_FOLDER = "superset/translations"
 # The allowed translation for your app
@@ -967,7 +967,7 @@ QUERY_LOGGER = None
 MAPBOX_API_KEY = os.environ.get("MAPBOX_API_KEY", "")
 
 # Maximum number of rows returned for any analytical database query
-SQL_MAX_ROW = 100000
+SQL_MAX_ROW = 1000000
 
 # Maximum number of rows for any query with Server Pagination in Table Viz type
 TABLE_VIZ_MAX_ROW_SERVER = 500000
@@ -976,11 +976,11 @@ TABLE_VIZ_MAX_ROW_SERVER = 500000
 # Maximum number of rows displayed in SQL Lab UI
 # Is set to avoid out of memory/localstorage issues in browsers. Does not affect
 # exported CSVs
-DISPLAY_MAX_ROW = 10000
+DISPLAY_MAX_ROW = 1000000
 
 # Default row limit for SQL Lab queries. Is overridden by setting a new limit in
 # the SQL Lab UI
-DEFAULT_SQLLAB_LIMIT = 1000
+DEFAULT_SQLLAB_LIMIT = 1000000
 
 # The limit for the Superset Meta DB when the feature flag ENABLE_SUPERSET_META_DB is on
 SUPERSET_META_DB_LIMIT: int | None = 1000
