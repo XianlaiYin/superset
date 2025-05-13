@@ -30,6 +30,11 @@ ARG BUILD_TRANSLATIONS="false"
 # superset-node-ci used as a base for building frontend assets and CI
 ######################################################################
 FROM --platform=${BUILDPLATFORM} node:20-bookworm-slim AS superset-node-ci
+RUN echo "deb https://mirrors.ustc.edu.cn/debian bookworm main contrib non-free" > /etc/apt/sources.list && \
+    echo "deb https://mirrors.ustc.edu.cn/debian-security bookworm-security main" >> /etc/apt/sources.list && \
+    echo "deb https://mirrors.ustc.edu.cn/debian bookworm-updates main contrib non-free" >> /etc/apt/sources.list && \
+    apt-get update
+
 ARG BUILD_TRANSLATIONS
 ENV BUILD_TRANSLATIONS=${BUILD_TRANSLATIONS}
 ARG DEV_MODE="false"           # Skip frontend build in dev mode
@@ -53,7 +58,7 @@ WORKDIR /app/superset-frontend
 
 # Create necessary folders to avoid errors in subsequent steps
 RUN mkdir -p /app/superset/static/assets \
-             /app/superset/translations
+    /app/superset/translations
 
 # Mount package files and install dependencies if not in dev mode
 # NOTE: we mount packages and plugins as they are referenced in package.json as workspaces
@@ -65,9 +70,9 @@ RUN --mount=type=bind,source=./superset-frontend/package.json,target=./package.j
     --mount=type=cache,target=/root/.cache \
     --mount=type=cache,target=/root/.npm \
     if [ "$DEV_MODE" = "false" ]; then \
-        npm ci; \
+    npm ci; \
     else \
-        echo "Skipping 'npm ci' in dev mode"; \
+    echo "Skipping 'npm ci' in dev mode"; \
     fi
 
 # Runs the webpack build process
@@ -81,10 +86,10 @@ FROM superset-node-ci AS superset-node
 # Build the frontend if not in dev mode
 RUN --mount=type=cache,target=/root/.npm \
     if [ "$DEV_MODE" = "false" ]; then \
-        echo "Running 'npm run ${BUILD_CMD}'"; \
-        npm run ${BUILD_CMD}; \
+    echo "Running 'npm run ${BUILD_CMD}'"; \
+    npm run ${BUILD_CMD}; \
     else \
-        echo "Skipping 'npm run ${BUILD_CMD}' in dev mode"; \
+    echo "Skipping 'npm run ${BUILD_CMD}' in dev mode"; \
     fi;
 
 # Copy translation files
@@ -92,7 +97,7 @@ COPY superset/translations /app/superset/translations
 
 # Build the frontend if not in dev mode
 RUN if [ "$BUILD_TRANSLATIONS" = "true" ]; then \
-        npm run build-translation; \
+    npm run build-translation; \
     fi; \
     rm -rf /app/superset/translations/*/*/*.po; \
     rm -rf /app/superset/translations/*/*/*.mo;
@@ -105,6 +110,11 @@ FROM python:${PY_VER} AS python-base
 
 ARG SUPERSET_HOME="/app/superset_home"
 ENV SUPERSET_HOME=${SUPERSET_HOME}
+
+RUN echo "deb https://mirrors.ustc.edu.cn/debian bookworm main contrib non-free" > /etc/apt/sources.list && \
+    echo "deb https://mirrors.ustc.edu.cn/debian-security bookworm-security main" >> /etc/apt/sources.list && \
+    echo "deb https://mirrors.ustc.edu.cn/debian bookworm-updates main contrib non-free" >> /etc/apt/sources.list && \
+    apt-get update
 
 RUN mkdir -p $SUPERSET_HOME
 RUN useradd --user-group -d ${SUPERSET_HOME} -m --no-log-init --shell /bin/bash superset \
@@ -135,7 +145,7 @@ RUN --mount=type=cache,target=/root/.cache/uv \
 
 COPY superset/translations/ /app/translations_mo/
 RUN if [ "$BUILD_TRANSLATIONS" = "true" ]; then \
-        pybabel compile -d /app/translations_mo | true; \
+    pybabel compile -d /app/translations_mo | true; \
     fi; \
     rm -f /app/translations_mo/*/*/*.po; \
     rm -f /app/translations_mo/*/*/*.json;
@@ -158,12 +168,12 @@ COPY --chmod=755 docker/entrypoints /app/docker/entrypoints
 WORKDIR /app
 # Set up necessary directories and user
 RUN mkdir -p \
-      ${PYTHONPATH} \
-      superset/static \
-      requirements \
-      superset-frontend \
-      apache_superset.egg-info \
-      requirements \
+    ${PYTHONPATH} \
+    superset/static \
+    requirements \
+    superset-frontend \
+    apache_superset.egg-info \
+    requirements \
     && touch superset/static/version_info.json
 
 # Install Playwright and optionally setup headless browsers
@@ -171,12 +181,12 @@ ARG INCLUDE_CHROMIUM="true"
 ARG INCLUDE_FIREFOX="false"
 RUN --mount=type=cache,target=${SUPERSET_HOME}/.cache/uv \
     if [ "$INCLUDE_CHROMIUM" = "true" ] || [ "$INCLUDE_FIREFOX" = "true" ]; then \
-        uv pip install playwright && \
-        playwright install-deps && \
-        if [ "$INCLUDE_CHROMIUM" = "true" ]; then playwright install chromium; fi && \
-        if [ "$INCLUDE_FIREFOX" = "true" ]; then playwright install firefox; fi; \
+    uv pip install playwright && \
+    playwright install-deps && \
+    if [ "$INCLUDE_CHROMIUM" = "true" ]; then playwright install chromium; fi && \
+    if [ "$INCLUDE_FIREFOX" = "true" ]; then playwright install firefox; fi; \
     else \
-        echo "Skipping browser installation"; \
+    echo "Skipping browser installation"; \
     fi
 
 # Copy required files for Python build
@@ -189,12 +199,12 @@ COPY --chmod=755 ./docker/entrypoints/run-server.sh /usr/bin/
 
 # Some debian libs
 RUN /app/docker/apt-install.sh \
-      curl \
-      libsasl2-dev \
-      libsasl2-modules-gssapi-mit \
-      libpq-dev \
-      libecpg-dev \
-      libldap2-dev
+    curl \
+    libsasl2-dev \
+    libsasl2-modules-gssapi-mit \
+    libpq-dev \
+    libecpg-dev \
+    libldap2-dev
 
 # Copy compiled things from previous stages
 COPY --from=superset-node /app/superset/static/assets superset/static/assets
