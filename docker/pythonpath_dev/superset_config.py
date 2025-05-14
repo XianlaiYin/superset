@@ -151,3 +151,7 @@ SUPERSET_WEBSERVER_TIMEOUT = 3600
 SQLLAB_TIMEOUT = 3600
 APP_NAME = "产业大数据分析平台"
 BABEL_DEFAULT_LOCALE = "en"
+LANGUAGES = {
+   "zh": {"flag": "cn", "name": "简体中文"},
+   "en": {"flag": "us", "name": "English"},
+}

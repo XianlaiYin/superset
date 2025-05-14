@@ -396,7 +396,10 @@ LANGUAGES = {
 }
 # Turning off i18n by default as translation in most languages are
 # incomplete and not well maintained.
-LANGUAGES = {}
+LANGUAGES = {
+   "zh": {"flag": "cn", "name": "简体中文"},
+   "en": {"flag": "us", "name": "English"},
+}
 
 
 # Override the default d3 locale format
